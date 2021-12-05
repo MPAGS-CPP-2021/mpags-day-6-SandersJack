@@ -3,7 +3,7 @@
 #include "CipherType.hpp"
 #include "ProcessCommandLine.hpp"
 #include "TransformChar.hpp"
-
+#include "Exceptions.hpp"
 #include <cctype>
 #include <fstream>
 #include <iostream>
@@ -20,11 +20,13 @@ int main(int argc, char* argv[])
         false, false, "", "", "", CipherMode::Encrypt, CipherType::Caesar};
 
     // Process command line arguments
-    const bool cmdLineStatus{processCommandLine(cmdLineArgs, settings)};
-
-    // Any failure in the argument processing means we can't continue
-    // Use a non-zero return value to indicate failure
-    if (!cmdLineStatus) {
+    try {
+        processCommandLine(cmdLineArgs, settings);
+    } catch( const MissingArg& error) {
+        std::cerr << "Missing argument:" << error.what() << std::endl;
+        return 1;
+    } catch ( const UnknownArg& error) {
+        std::cerr << "Unknown argument:" << error.what() << std::endl;
         return 1;
     }
 
